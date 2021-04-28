@@ -826,15 +826,7 @@ class KAGParser
 	 */	
 	function loadScenario(name, buffer)
 	{
-		try
-		{
-			return this.__internal_KAGParser_instance.loadScenario(name, buffer);
-		}
-		catch(e)
-		{
-			dm(e.message);
-		}
-		
+		return this.__internal_KAGParser_instance.loadScenario(name, buffer);
 	}
 
 	/**
