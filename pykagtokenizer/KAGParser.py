@@ -72,7 +72,10 @@ class internal_KAGParser_ScenarioCacheItem:
 				line = self.lines[i]
 				if len(line) >= 2 and line[0] == "*":
 					## page name found
-					label = line[:line.find("|")]
+					label = line
+					pipe_pos = line.find("|")
+					if pipe_pos != -1:
+						label = line[:pipe_pos]
 					if len(label) == 1:
 						if len(prevlabel) == 0:
 							raise Exception(TVPKAGCannotOmmitFirstLabelName)
@@ -512,8 +515,8 @@ class internal_KAGParser:
 
 	def getParsedScenario(self):
 		res = {}
-		last_line = self.curLine
-		last_line_str = self.curLineStr
+		last_line = None
+		last_line_str = None
 		cur_line_array = []
 		all_lines_array = []
 		char_array = []
@@ -521,12 +524,14 @@ class internal_KAGParser:
 			res = self._getNextTag()
 			if res != None and len(res) != 0:
 				if self.curLine != last_line or self.curLineStr != last_line_str:
-					if len(char_array) > 0:
-						cur_line_array.append("".join(char_array))
-						del char_array[:]
+					if last_line != None:
+						if len(char_array) > 0:
+							cur_line_array.append("".join(char_array))
+							del char_array[:]
+					if last_line != None:
+						all_lines_array.append(cur_line_array)
 					last_line = self.curLine
 					last_line_str = self.curLineStr
-					all_lines_array.append(cur_line_array)
 					cur_line_array = []
 				rres = copy.deepcopy(res)
 				if rres["tagname"] == "ch" and type(rres["text"]) is str and len(rres["text"]) == 1 and len(rres) == 2:
