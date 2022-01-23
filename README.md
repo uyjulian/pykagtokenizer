@@ -15,10 +15,6 @@ import pykagtokenizer
 structure = pykagtokenizer.tokenize_scenario("hoge[l][r]")
 ```
 
-# Dependencies
-
-* pytjs
-
 # License
 
 MIT.
