@@ -55,8 +55,15 @@ class internal_KAGParser_ScenarioCacheItem:
 			raise Exception("Name not Array or String!")
 		## pass1: count lines
 		## pass2: split lines
+		in_inline_script = False
 		for i in range(len(self.lines)):
-			self.lines[i] = self.lines[i].lstrip("\t") ## skip leading tabs
+			p = self.lines[i].lstrip("\t")
+			if (p == "[iscript]" or p == "[iscript]\\") or (p == "@iscript"):
+				in_inline_script = True
+			if not in_inline_script:
+				self.lines[i] = p ## skip leading tabs
+			if ((p == "[endscript]" or p == "[endscript]\\")) or (p == "@endscript"):
+				in_inline_script = False
 
 		## tab-only last line will not be counted in pass2, thus makes
 		## pass2 counted lines are lesser than pass1 lines.
@@ -434,7 +441,7 @@ class internal_KAGParser:
 				entity = False
 				value = ""
 
-				if self.curLineStr[self.curPos] != "=":
+				if len(self.curLineStr) == self.curPos or self.curLineStr[self.curPos] != "=":
 					## arrtibute value omitted
 					value = "true" # always true
 				else:
@@ -530,6 +537,11 @@ class internal_KAGParser:
 							del char_array[:]
 					if last_line != None:
 						all_lines_array.append(cur_line_array)
+						if not (type(res) is dict and "tagname" in res and type(res["tagname"]) is dict and "type" in res["tagname"] and res["tagname"]["type"] == "iscript"):
+							for i in range(last_line, self.curLine):
+								line = self.lines[i]
+								if line == "":
+									all_lines_array.append([])
 					last_line = self.curLine
 					last_line_str = self.curLineStr
 					cur_line_array = []
